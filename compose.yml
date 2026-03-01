@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: glimmer-closet-db
+    environment:
+      POSTGRES_DB: glimmer_closet
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - glimmer_closet_pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+      additional_contexts:
+        - cache=/tmp/docker-cache
+    container_name: glimmer-closet-api
+    depends_on:
+      - db
+    environment:
+      PORT: 4000
+      DATABASE_URL: postgres://postgres:postgres@db:5432/glimmer_closet
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-change_me}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:4001}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3001}
+      LOCAL_UPLOAD_DIR: /app/uploads
+      R2_BUCKET: ${R2_BUCKET:-}
+      R2_REGION: ${R2_REGION:-auto}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_PUBLIC_BASE_URL: ${R2_PUBLIC_BASE_URL:-}
+    ports:
+      - "4001:4000"
+    volumes:
+      - glimmer_closet_uploads:/app/uploads
+    restart: unless-stopped
+
+  web:
+    build: .
+    container_name: glimmer-closet-web
+    depends_on:
+      - api
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: production
+      CONTENT_API_BASE_URL: ${CONTENT_API_BASE_URL:-http://api:4000}
+      NEXT_PUBLIC_CONTENT_API_BASE_URL: ${NEXT_PUBLIC_CONTENT_API_BASE_URL:-http://localhost:4001}
+    restart: unless-stopped
+
+volumes:
+  glimmer_closet_pg_data:
+  glimmer_closet_uploads:
