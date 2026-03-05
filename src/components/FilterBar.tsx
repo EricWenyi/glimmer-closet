@@ -25,6 +25,38 @@ type FilterBarProps = {
   onReset: () => void;
 };
 
+// 颜色映射表 - 使用莫兰迪色系
+const colorDotMap: Record<string, string> = {
+  'black': '#2d2d2d',
+  'white': '#f8f8f8',
+  'gray': '#9a9a9a',
+  'red': '#c97b7b',
+  'blue': '#7b9ac9',
+  'green': '#8fb89a',
+  'yellow': '#e6d29a',
+  'pink': '#e6b8c7',
+  'purple': '#b8a8c9',
+  'brown': '#a89080',
+  'beige': '#e8dcc8',
+  'multicolor': 'linear-gradient(45deg, #e6b8c7, #b8a8c9, #e6d29a)',
+};
+
+// 颜色代码映射
+const colorCodeMap: Record<string, string> = {
+  '黑': 'black',
+  '白': 'white',
+  '灰': 'gray',
+  '红': 'red',
+  '蓝': 'blue',
+  '绿': 'green',
+  '黄': 'yellow',
+  '粉': 'pink',
+  '紫': 'purple',
+  '棕': 'brown',
+  '米色': 'beige',
+  '花色': 'multicolor',
+};
+
 export default function FilterBar(props: FilterBarProps) {
   const {
     categoryOptions,
@@ -44,6 +76,15 @@ export default function FilterBar(props: FilterBarProps) {
     onReset,
   } = props;
 
+  const getColorDotStyle = (label: string) => {
+    const colorKey = colorCodeMap[label];
+    const color = colorDotMap[colorKey] || '#ccc';
+    return {
+      background: color,
+      border: ['白', '米色'].includes(label) ? '1.5px solid #ddd' : '1.5px solid rgba(0,0,0,0.1)',
+    };
+  };
+
   return (
     <section className="filter-bar">
       <div className="filter-top-row">
@@ -51,7 +92,7 @@ export default function FilterBar(props: FilterBarProps) {
           type="text"
           value={searchText}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="搜索衣服名称或备注"
+          placeholder="搜索衣服名称或备注..."
           className="search-input"
         />
         <button type="button" className="reset-btn" onClick={onReset}>清空筛选</button>
@@ -90,6 +131,10 @@ export default function FilterBar(props: FilterBarProps) {
               className={`tag-btn ${selectedColors.includes(option.value) ? 'active' : ''}`}
               onClick={() => onToggleColor(option.value)}
             >
+              <span 
+                className="color-dot" 
+                style={getColorDotStyle(option.label)}
+              />
               {option.label}
             </button>
           ))}

@@ -122,9 +122,10 @@ export default function Home() {
   return (
     <main className="closet-page">
       <header className="closet-header">
-        <p className="eyebrow">Glimmer Closet</p>
-        <h1>智能衣柜</h1>
-        <p className="subtitle">通过 WhatsApp 上传，自动归档你的每一件衣服。</p>
+        <p className="eyebrow">✦ Glimmer Closet ✦</p>
+        <h1>我的智能衣柜</h1>
+        <div className="decorative-line" />
+        <p className="subtitle">通过 WhatsApp 上传照片，自动归档你的每一件心爱衣物</p>
       </header>
 
       <FilterBar
@@ -153,12 +154,12 @@ export default function Home() {
         }}
       />
 
-      {loading && <p className="state-text">正在加载衣柜...</p>}
+      {loading && <p className="state-text">正在为您整理衣柜...</p>}
       {error && <p className="state-text state-error">{error}</p>}
 
       {!loading && !error && (
         <section className="closet-grid">
-          {items.length === 0 && <p className="state-text">没有匹配的衣服，试试调整筛选条件。</p>}
+          {items.length === 0 && <p className="state-text">还没有找到匹配的衣物，试试调整筛选条件吧 ✨</p>}
           {items.map((cloth) => (
             <ClothCard
               key={cloth.shortCode}
