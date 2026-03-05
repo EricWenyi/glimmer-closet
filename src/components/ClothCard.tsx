@@ -9,23 +9,44 @@ type ClothCardProps = {
   occasionLabels: string[];
 };
 
-// 颜色映射表
+// Apple-style color palette
 const colorMap: Record<string, string> = {
-  '黑': '#2d2d2d',
-  '白': '#f8f8f8',
-  '灰': '#9a9a9a',
-  '红': '#c97b7b',
-  '蓝': '#7b9ac9',
-  '绿': '#8fb89a',
-  '黄': '#e6d29a',
-  '粉': '#e6b8c7',
-  '紫': '#b8a8c9',
-  '棕': '#a89080',
-  '米色': '#e8dcc8',
-  '花色': 'linear-gradient(45deg, #e6b8c7, #b8a8c9, #e6d29a)',
+  黑: '#1a1a1a',
+  白: '#f2f2f7',
+  灰: '#8e8e93',
+  红: '#ff3b30',
+  蓝: '#007aff',
+  绿: '#34c759',
+  黄: '#ffcc00',
+  粉: '#ff2d55',
+  紫: '#af52de',
+  棕: '#a2845e',
+  米色: '#e5d4b8',
+  花色: 'linear-gradient(135deg, #ff3b30, #ffcc00, #34c759, #007aff)',
 };
 
-export default function ClothCard({ cloth, categoryLabel, colorLabels, seasonLabels, occasionLabels }: ClothCardProps) {
+const colorTextMap: Record<string, string> = {
+  黑: '#ffffff',
+  白: '#1a1a1a',
+  灰: '#ffffff',
+  红: '#ffffff',
+  蓝: '#ffffff',
+  绿: '#ffffff',
+  黄: '#1a1a1a',
+  粉: '#ffffff',
+  紫: '#ffffff',
+  棕: '#ffffff',
+  米色: '#1a1a1a',
+  花色: '#ffffff',
+};
+
+export default function ClothCard({
+  cloth,
+  categoryLabel,
+  colorLabels,
+  seasonLabels,
+  occasionLabels,
+}: ClothCardProps) {
   return (
     <article className="cloth-card" data-cloth-id={cloth.shortCode}>
       <div className="cloth-image-wrap">
@@ -34,7 +55,7 @@ export default function ClothCard({ cloth, categoryLabel, colorLabels, seasonLab
           alt={cloth.name}
           className="cloth-image"
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, (max-width: 1200px) 33vw, 25vw"
           unoptimized
         />
       </div>
@@ -49,12 +70,12 @@ export default function ClothCard({ cloth, categoryLabel, colorLabels, seasonLab
 
         <div className="chip-group">
           {colorLabels.map((label) => (
-            <span 
-              key={`${cloth.shortCode}-color-${label}`} 
+            <span
+              key={`${cloth.shortCode}-color-${label}`}
               className="chip chip-color"
-              style={{ 
-                background: colorMap[label] || '#f0f0f0',
-                color: ['白', '米色'].includes(label) ? '#666' : '#fff',
+              style={{
+                background: colorMap[label] || '#f2f2f7',
+                color: colorTextMap[label] || '#1a1a1a',
               }}
             >
               {label}
@@ -64,14 +85,16 @@ export default function ClothCard({ cloth, categoryLabel, colorLabels, seasonLab
 
         <div className="chip-group">
           {seasonLabels.map((label) => (
-            <span key={`${cloth.shortCode}-season-${label}`} className="chip chip-season">{label}</span>
+            <span key={`${cloth.shortCode}-season-${label}`} className="chip chip-season">
+              {label}
+            </span>
           ))}
           {occasionLabels.map((label) => (
-            <span key={`${cloth.shortCode}-occasion-${label}`} className="chip chip-occasion">{label}</span>
+            <span key={`${cloth.shortCode}-occasion-${label}`} className="chip chip-occasion">
+              {label}
+            </span>
           ))}
         </div>
-
-        {cloth.description && <p className="cloth-description">{cloth.description}</p>}
       </div>
     </article>
   );

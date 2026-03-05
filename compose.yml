@@ -45,7 +45,7 @@ services:
     depends_on:
       - api
     ports:
-      - "3001:3000"
+      - "3001:3001"
     environment:
       NODE_ENV: production
       CONTENT_API_BASE_URL: ${CONTENT_API_BASE_URL:-http://api:4000}

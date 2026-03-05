@@ -86,7 +86,7 @@ export default function Home() {
       occasions,
       q: searchText,
     }),
-    [category, colors, seasons, occasions, searchText],
+    [category, colors, seasons, occasions, searchText]
   );
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function Home() {
         }
       } catch {
         if (!cancelled) {
-          setError('加载衣柜失败，请检查 API 服务和 Tunnel。');
+          setError('加载失败，请检查网络连接');
         }
       } finally {
         if (!cancelled) {
@@ -119,13 +119,20 @@ export default function Home() {
     };
   }, [filters]);
 
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (category) count++;
+    count += colors.length;
+    count += seasons.length;
+    count += occasions.length;
+    return count;
+  }, [category, colors, seasons, occasions]);
+
   return (
     <main className="closet-page">
       <header className="closet-header">
-        <p className="eyebrow">✦ Glimmer Closet ✦</p>
-        <h1>我的智能衣柜</h1>
-        <div className="decorative-line" />
-        <p className="subtitle">通过 WhatsApp 上传照片，自动归档你的每一件心爱衣物</p>
+        <h1>Glimmer Closet</h1>
+        <p className="subtitle">智能衣柜 · 轻松管理每一件衣服</p>
       </header>
 
       <FilterBar
@@ -138,10 +145,15 @@ export default function Home() {
         selectedSeasons={seasons}
         selectedOccasions={occasions}
         searchText={searchText}
+        activeFiltersCount={activeFiltersCount}
         onCategoryChange={setCategory}
         onSearchChange={setSearchText}
-        onToggleColor={(value) => setColors((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))}
-        onToggleSeason={(value) => setSeasons((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))}
+        onToggleColor={(value) =>
+          setColors((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))
+        }
+        onToggleSeason={(value) =>
+          setSeasons((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))
+        }
         onToggleOccasion={(value) =>
           setOccasions((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))
         }
@@ -154,13 +166,40 @@ export default function Home() {
         }}
       />
 
-      {loading && <p className="state-text">正在为您整理衣柜...</p>}
-      {error && <p className="state-text state-error">{error}</p>}
+      <div className="results-count">
+        {loading ? (
+          '加载中...'
+        ) : error ? null : (
+          <>
+            共 <span>{items.length}</span> 件衣物
+          </>
+        )}
+      </div>
 
-      {!loading && !error && (
-        <section className="closet-grid">
-          {items.length === 0 && <p className="state-text">还没有找到匹配的衣物，试试调整筛选条件吧 ✨</p>}
-          {items.map((cloth) => (
+      <section className="closet-grid">
+        {loading ? (
+          // Loading skeleton
+          <>
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="skeleton-card">
+                <div className="skeleton-image" />
+                <div className="skeleton-content">
+                  <div className="skeleton-line short" />
+                  <div className="skeleton-line" />
+                </div>
+              </div>
+            ))}
+          </>
+        ) : error ? (
+          <div className="state-text state-error">{error}</div>
+        ) : items.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">👗</div>
+            <h3>还没有找到衣物</h3>
+            <p>试试调整筛选条件，或通过 WhatsApp 上传新衣服</p>
+          </div>
+        ) : (
+          items.map((cloth) => (
             <ClothCard
               key={cloth.shortCode}
               cloth={cloth}
@@ -169,9 +208,9 @@ export default function Home() {
               seasonLabels={cloth.seasons.map((season) => SEASON_LABELS[season])}
               occasionLabels={cloth.occasions.map((occasion) => OCCASION_LABELS[occasion])}
             />
-          ))}
-        </section>
-      )}
+          ))
+        )}
+      </section>
     </main>
   );
 }
