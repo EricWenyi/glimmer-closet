@@ -74,6 +74,10 @@ export default function Home() {
   const [occasions, setOccasions] = useState<ClothOccasion[]>([]);
   const [searchText, setSearchText] = useState('');
 
+  type Tab = 'closet' | 'today';
+  const [activeTab, setActiveTab] = useState<Tab>('closet');
+  const [uploadOpen, setUploadOpen] = useState(false);
+
   const [items, setItems] = useState<Cloth[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -135,82 +139,124 @@ export default function Home() {
         <p className="subtitle">智能衣柜 · 轻松管理每一件衣服</p>
       </header>
 
-      <FilterBar
-        categoryOptions={CATEGORY_OPTIONS}
-        colorOptions={COLOR_OPTIONS}
-        seasonOptions={SEASON_OPTIONS}
-        occasionOptions={OCCASION_OPTIONS}
-        selectedCategory={category}
-        selectedColors={colors}
-        selectedSeasons={seasons}
-        selectedOccasions={occasions}
-        searchText={searchText}
-        activeFiltersCount={activeFiltersCount}
-        onCategoryChange={setCategory}
-        onSearchChange={setSearchText}
-        onToggleColor={(value) =>
-          setColors((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))
-        }
-        onToggleSeason={(value) =>
-          setSeasons((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))
-        }
-        onToggleOccasion={(value) =>
-          setOccasions((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))
-        }
-        onReset={() => {
-          setCategory(undefined);
-          setColors([]);
-          setSeasons([]);
-          setOccasions([]);
-          setSearchText('');
-        }}
-      />
-
-      <div className="results-count">
-        {loading ? (
-          '加载中...'
-        ) : error ? null : (
-          <>
-            共 <span>{items.length}</span> 件衣物
-          </>
-        )}
+      {/* Tab bar */}
+      <div className="tab-bar">
+        <button
+          type="button"
+          className={`tab-btn ${activeTab === 'closet' ? 'active' : ''}`}
+          onClick={() => setActiveTab('closet')}
+        >
+          我的衣橱
+        </button>
+        <button
+          type="button"
+          className={`tab-btn ${activeTab === 'today' ? 'active' : ''}`}
+          onClick={() => setActiveTab('today')}
+        >
+          今日穿搭
+        </button>
       </div>
 
-      <section className="closet-grid">
-        {loading ? (
-          // Loading skeleton
-          <>
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="skeleton-card">
-                <div className="skeleton-image" />
-                <div className="skeleton-content">
-                  <div className="skeleton-line short" />
-                  <div className="skeleton-line" />
-                </div>
-              </div>
-            ))}
-          </>
-        ) : error ? (
-          <div className="state-text state-error">{error}</div>
-        ) : items.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-state-icon">👗</div>
-            <h3>还没有找到衣物</h3>
-            <p>试试调整筛选条件，或通过 WhatsApp 上传新衣服</p>
+      {/* My Closet tab */}
+      {activeTab === 'closet' && (
+        <>
+          <FilterBar
+            categoryOptions={CATEGORY_OPTIONS}
+            colorOptions={COLOR_OPTIONS}
+            seasonOptions={SEASON_OPTIONS}
+            occasionOptions={OCCASION_OPTIONS}
+            selectedCategory={category}
+            selectedColors={colors}
+            selectedSeasons={seasons}
+            selectedOccasions={occasions}
+            searchText={searchText}
+            activeFiltersCount={activeFiltersCount}
+            onCategoryChange={setCategory}
+            onSearchChange={setSearchText}
+            onToggleColor={(value) =>
+              setColors((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))
+            }
+            onToggleSeason={(value) =>
+              setSeasons((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))
+            }
+            onToggleOccasion={(value) =>
+              setOccasions((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))
+            }
+            onReset={() => {
+              setCategory(undefined);
+              setColors([]);
+              setSeasons([]);
+              setOccasions([]);
+              setSearchText('');
+            }}
+          />
+
+          <div className="results-count">
+            {loading ? (
+              '加载中...'
+            ) : error ? null : (
+              <>
+                共 <span>{items.length}</span> 件衣物
+              </>
+            )}
           </div>
-        ) : (
-          items.map((cloth) => (
-            <ClothCard
-              key={cloth.shortCode}
-              cloth={cloth}
-              categoryLabel={CATEGORY_LABELS[cloth.category]}
-              colorLabels={cloth.colors.map((color) => COLOR_LABELS[color])}
-              seasonLabels={cloth.seasons.map((season) => SEASON_LABELS[season])}
-              occasionLabels={cloth.occasions.map((occasion) => OCCASION_LABELS[occasion])}
-            />
-          ))
-        )}
-      </section>
+
+          <section className="closet-grid">
+            {loading ? (
+              <>
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="skeleton-card">
+                    <div className="skeleton-image" />
+                    <div className="skeleton-content">
+                      <div className="skeleton-line short" />
+                      <div className="skeleton-line" />
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : error ? (
+              <div className="state-text state-error">{error}</div>
+            ) : items.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-state-icon">👗</div>
+                <h3>还没有找到衣物</h3>
+                <p>点击右下角 + 按钮上传新衣服</p>
+              </div>
+            ) : (
+              items.map((cloth) => (
+                <ClothCard
+                  key={cloth.shortCode}
+                  cloth={cloth}
+                  categoryLabel={CATEGORY_LABELS[cloth.category]}
+                  colorLabels={cloth.colors.map((color) => COLOR_LABELS[color])}
+                  seasonLabels={cloth.seasons.map((season) => SEASON_LABELS[season])}
+                  occasionLabels={cloth.occasions.map((occasion) => OCCASION_LABELS[occasion])}
+                />
+              ))
+            )}
+          </section>
+        </>
+      )}
+
+      {/* Today's Look tab — placeholder, wired in Task 7 */}
+      {activeTab === 'today' && (
+        <div className="state-text">今日穿搭功能加载中...</div>
+      )}
+
+      {/* Upload FAB */}
+      <button
+        type="button"
+        className="upload-fab"
+        onClick={() => setUploadOpen(true)}
+        aria-label="上传新衣服"
+      >
+        +
+      </button>
+
+      {/* Upload Modal — wired in Task 5 */}
+      {uploadOpen && (
+        <div className="modal-backdrop" onClick={() => setUploadOpen(false)} />
+      )}
     </main>
   );
 }
