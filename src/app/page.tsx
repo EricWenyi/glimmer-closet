@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import ClothCard from '@/components/ClothCard';
 import FilterBar from '@/components/FilterBar';
 import UploadModal from '@/components/UploadModal';
+import TodaysLookTab from '@/components/TodaysLookTab';
 import {
   type Cloth,
   type ClothCategory,
@@ -240,10 +241,7 @@ export default function Home() {
         </>
       )}
 
-      {/* Today's Look tab — placeholder, wired in Task 7 */}
-      {activeTab === 'today' && (
-        <div className="state-text">今日穿搭功能加载中...</div>
-      )}
+      {activeTab === 'today' && <TodaysLookTab />}
 
       {/* Upload FAB */}
       <button
