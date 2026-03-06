@@ -24,8 +24,8 @@ export default function WeatherBanner({ onWeather, onGeoError }: Props) {
 
   useEffect(() => {
     if (!navigator.geolocation) {
-      setState('denied');
       onGeoError();
+      Promise.resolve().then(() => setState('denied'));
       return;
     }
 

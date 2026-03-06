@@ -39,8 +39,9 @@ export default function TodaysLookTab() {
   useEffect(() => {
     if (!weather || wardrobe.length === 0) return;
 
-    setLoading(true);
-    recommendOutfits(weather, wardrobe)
+    void Promise.resolve()
+      .then(() => setLoading(true))
+      .then(() => recommendOutfits(weather, wardrobe))
       .then((results) => {
         setOutfits(results);
         setSelectedIndex(null);
