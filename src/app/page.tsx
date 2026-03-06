@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import ClothCard from '@/components/ClothCard';
 import FilterBar from '@/components/FilterBar';
+import UploadModal from '@/components/UploadModal';
 import {
   type Cloth,
   type ClothCategory,
@@ -77,6 +78,7 @@ export default function Home() {
   type Tab = 'closet' | 'today';
   const [activeTab, setActiveTab] = useState<Tab>('closet');
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const [items, setItems] = useState<Cloth[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,7 +123,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [filters]);
+  }, [filters, refreshKey]);
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
@@ -253,9 +255,18 @@ export default function Home() {
         +
       </button>
 
-      {/* Upload Modal — wired in Task 5 */}
+      {/* Upload Modal */}
       {uploadOpen && (
-        <div className="modal-backdrop" onClick={() => setUploadOpen(false)} />
+        <>
+          <div className="modal-backdrop" onClick={() => setUploadOpen(false)} />
+          <UploadModal
+            onClose={() => setUploadOpen(false)}
+            onUploaded={() => {
+              // Re-trigger the wardrobe fetch by bumping a counter
+              setRefreshKey((k) => k + 1);
+            }}
+          />
+        </>
       )}
     </main>
   );
